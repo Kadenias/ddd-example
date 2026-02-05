@@ -1,0 +1,24 @@
+type Book {
+  id: Int!
+  title: String!
+  author: String!
+}
+
+input BookInput {
+  id: Int!
+  title: String!
+  author: String!
+}
+
+type Query {
+  books: [Book]
+}
+
+type Mutations {
+  updateBook(book: BookInput!): Book
+}
+
+type MessageResponse {
+  message: String!
+}
+

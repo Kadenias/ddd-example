@@ -1,0 +1,57 @@
+version: '3.5'
+
+services:
+  app:
+    container_name: book_loan_application
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on: [postgres]
+    environment:
+      TZ: Europe/Berlin
+      DB_HOST: book_loan_postgres
+      DB_PORT: 5432
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: sldmsdiwoeu867
+      JAVA_TOOL_OPTIONS=-agentlib:jdwp: transport=dt_socket,server=y,suspend=n,address=*:5005
+    ports:
+      - "8080:8080"
+    networks:
+      - book_loan_network
+  postgres:
+    container_name: book_loan_postgres
+    image: postgres:16.3
+    environment:
+      TZ: Europe/Berlin
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: sldmsdiwoeu867
+      POSTGRES_DB: db
+    ports:
+      - "5490:5432"
+    networks:
+      - book_loan_network
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - book_loan_network
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - book_loan_network
+
+networks:
+  book_loan_network:
+    name: book_loan_network
+    driver: bridge
+
